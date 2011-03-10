@@ -16,7 +16,7 @@ h2. Installation
 Drop the following dependency in your <code>project.clj</code> at the appropriate place:
 
 <pre>
-[ring-partial-content "0.0.1-SNAPSHOT"]
+[ring-partial-content "0.0.1"]
 </pre>
 
 

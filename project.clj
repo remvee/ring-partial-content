@@ -1,4 +1,4 @@
-(defproject ring-partial-content "0.0.1-SNAPSHOT"
+(defproject ring-partial-content "0.0.1"
   :description "Partial Content middleware for ring."
   
   :dependencies [[org.clojure/clojure "1.2.0"]
