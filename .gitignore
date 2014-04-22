@@ -1,2 +1,5 @@
 /lib/
-/autodoc/
+/.lein-deps-sum
+/.lein-failures
+/pom.xml
+/target/

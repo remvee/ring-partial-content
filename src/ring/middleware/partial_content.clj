@@ -6,7 +6,7 @@
 ;; terms of this license.  You must not remove this notice, or any other, from
 ;; this software.
 
-(ns remvee.ring.middleware.partial-content
+(ns ring.middleware.partial-content
   "Partial Content middleware for ring."
   {:author "Remco van 't Veer"}
   (:refer-clojure :exclude [subs])
