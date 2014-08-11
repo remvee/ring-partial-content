@@ -6,7 +6,7 @@ Ring middleware to provide Partial Content responses as described in RFC2616 sec
 h2. Usage
 
 <pre>
-(use 'remvee.ring.middleware.partial-content)
+(use 'ring.middleware.partial-content)
 (def app (-> routes .. wrap-partial-content))
 </pre>
 
@@ -16,7 +16,7 @@ h2. Installation
 Drop the following dependency in your <code>project.clj</code> at the appropriate place:
 
 <pre>
-[ring-partial-content "0.0.1"]
+[ring-partial-content "1.0.0"]
 </pre>
 
 
