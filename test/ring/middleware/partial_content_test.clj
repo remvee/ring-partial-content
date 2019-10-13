@@ -15,9 +15,13 @@
 
 (deftest slice
   (testing "string"
-    (is (= "3456" (sut/slice "0123456789" 3 7)))
-    (is (= "0123456" (sut/slice "0123456789" 0 7)))
-    (is (= "3456789" (sut/slice "0123456789" 3 10))))
+    (let [f (fn [value start end]
+              (slurp (sut/slice value start end)))]
+      (is (= "3456" (f "0123456789" 3 7)))
+      (is (= "0123456" (f "0123456789" 0 7)))
+      (is (= "3456789" (f "0123456789" 3 10)))
+      (is (= 7 (count (.getBytes "34😊6"))) ;; sanity check
+          (= "34😊6" (f "01234😊6789" 3 10)))))
 
   (testing "inputstream"
     (testing "slurp"
@@ -39,12 +43,13 @@
 (deftest wrap-partial-content
   (are [req expected]
       (= expected
-         ((sut/wrap-partial-content
-           (fn [_]
-             {:status  200
-              :headers {"Content-Length" "10"}
-              :body    "0123456789"}))
-          req))
+         (-> ((sut/wrap-partial-content
+               (fn [_]
+                 {:status  200
+                  :headers {"Content-Length" "10"}
+                  :body    "0123456789"}))
+              req)
+             (update :body slurp)))
 
     {:headers {"range" "bytes=5-7"}}
     {:status  206

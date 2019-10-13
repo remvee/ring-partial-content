@@ -9,12 +9,12 @@
 (ns ring.middleware.partial-content
   "Partial Content middleware for ring."
   {:author "Remco van 't Veer"}
-  (:import [java.io File FileInputStream InputStream]))
+  (:import [java.io ByteArrayInputStream File FileInputStream InputStream]))
 
 (defmulti slice (fn [value start end] (class value)))
 
 (defmethod slice String [value start end]
-  (.substring value start end))
+  (slice (ByteArrayInputStream. (.getBytes value)) start end))
 
 (defmethod slice InputStream [in start end]
   (.skip in start)
