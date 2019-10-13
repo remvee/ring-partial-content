@@ -18,12 +18,23 @@
     (is (= "3456" (sut/slice "0123456789" 3 7)))
     (is (= "0123456" (sut/slice "0123456789" 0 7)))
     (is (= "3456789" (sut/slice "0123456789" 3 10))))
+
   (testing "inputstream"
-    (let [f (fn [value start end]
-              (slurp (sut/slice (StringBufferInputStream. value) start end)))]
-      (is (= "3456" (f "0123456789" 3 7)))
-      (is (= "0123456" (f "0123456789" 0 7)))
-      (is (= "3456789" (f "0123456789" 3 10))))))
+    (testing "slurp"
+      (let [f (fn [value start end]
+                (slurp (sut/slice (StringBufferInputStream. value) start end)))]
+        (is (= "3456" (f "0123456789" 3 7)))
+        (is (= "0123456" (f "0123456789" 0 7)))
+        (is (= "3456789" (f "0123456789" 3 10)))))
+    (testing "read"
+      (let [buf (byte-array 2)
+            in (sut/slice (StringBufferInputStream. "0123456789") 3 6)]
+        (is (and (= 2 (.read in buf))
+                 (= (byte \3) (aget buf 0))
+                 (= (byte \4) (aget buf 1))))
+        (is (and (= 1 (.read in buf))
+                 (= (byte \5) (aget buf 0))))
+        (is (and (= -1 (.read in buf))))))))
 
 (deftest wrap-partial-content
   (are [req expected]

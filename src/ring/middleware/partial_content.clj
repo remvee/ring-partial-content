@@ -22,22 +22,20 @@
     (proxy [InputStream] []
       (read
         ([]
-         (dosync
-          (if (pos? @n)
-            (do
-              (swap! n dec)
-              (.read in))
-            -1)))
+         (if (pos? @n)
+           (do
+             (swap! n dec)
+             (.read in))
+           -1))
         ([b]
+         ;; delegate to arity-3
          (.read this b 0 (count b)))
         ([b off len]
-         (dosync
-          (if (> @n off)
-            (do
-              (let [rem (min len @n)]
-                (swap! n - (+ off len))
-                (.read in b off rem)))
-            -1)))))))
+         (if (> @n off)
+           (let [rem (min len @n)]
+             (swap! n - (+ off len))
+             (.read in b off rem))
+           -1))))))
 
 (defmethod slice File [file start end]
   (slice (FileInputStream. file) start end))
