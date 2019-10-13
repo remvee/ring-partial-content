@@ -13,8 +13,8 @@
 
 (defmulti slice (fn [value start end] (class value)))
 
-(defmethod slice String [value start end]
-  (slice (ByteArrayInputStream. (.getBytes value)) start end))
+(defmethod slice :default [_ _ _]
+  nil)
 
 (defmethod slice InputStream [in start end]
   (.skip in start)
@@ -40,6 +40,9 @@
 (defmethod slice File [file start end]
   (slice (FileInputStream. file) start end))
 
+(defmethod slice String [value start end]
+  (slice (ByteArrayInputStream. (.getBytes value)) start end))
+
 (defn wrap-partial-content
   "Wrap an app such that a request for a range will respond with a 206
    Partial Content response with the appropriate headers set and the
@@ -58,12 +61,15 @@
                                                (rest (re-matches #"bytes=(\d*)-(\d*)" v))))]
       (if (and (= 200 status) len (or start end))
         (let [start (or start 0)
-              end   (or end (dec len))]
-          (-> res
-              (assoc :status 206)
-              (assoc-in [:headers "Content-Range"]
-                        (str "bytes " start "-" end "/" len))
-              (assoc-in [:headers "Content-Length"]
-                        (str (- (inc end) start)))
-              (assoc :body (slice body start (inc end)))))
+              end   (or end (dec len))
+              body  (slice body start (inc end))]
+          (if body
+            (-> res
+                (assoc :status 206)
+                (assoc-in [:headers "Content-Range"]
+                          (str "bytes " start "-" end "/" len))
+                (assoc-in [:headers "Content-Length"]
+                          (str (- (inc end) start)))
+                (assoc :body body))
+            res))
         res))))

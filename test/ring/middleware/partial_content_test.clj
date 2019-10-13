@@ -14,6 +14,7 @@
   (:import java.io.StringBufferInputStream))
 
 (deftest slice
+
   (testing "string"
     (let [f (fn [value start end]
               (slurp (sut/slice value start end)))]
@@ -24,12 +25,14 @@
           (= "34😊6" (f "01234😊6789" 3 10)))))
 
   (testing "inputstream"
+
     (testing "slurp"
       (let [f (fn [value start end]
                 (slurp (sut/slice (StringBufferInputStream. value) start end)))]
         (is (= "3456" (f "0123456789" 3 7)))
         (is (= "0123456" (f "0123456789" 0 7)))
         (is (= "3456789" (f "0123456789" 3 10)))))
+
     (testing "read"
       (let [buf (byte-array 2)
             in (sut/slice (StringBufferInputStream. "0123456789") 3 6)]
@@ -41,30 +44,39 @@
         (is (and (= -1 (.read in buf))))))))
 
 (deftest wrap-partial-content
-  (are [req expected]
-      (= expected
-         (-> ((sut/wrap-partial-content
-               (fn [_]
-                 {:status  200
-                  :headers {"Content-Length" "10"}
-                  :body    "0123456789"}))
-              req)
-             (update :body slurp)))
 
-    {:headers {"range" "bytes=5-7"}}
-    {:status  206
-     :headers {"Content-Length" "3"
-               "Content-Range"  "bytes 5-7/10"}
-     :body    "567"}
+  (testing "range cases"
+    (let [res {:status  200
+               :headers {"Content-Length" "10"}
+               :body    "0123456789"}
+          f (sut/wrap-partial-content (constantly res))]
+      (are [req expected]
+          (= expected
+             (-> (f req)
+                 (update :body slurp)))
 
-    {:headers {"range" "bytes=-7"}}
-    {:status  206
-     :headers {"Content-Length" "8"
-               "Content-Range"  "bytes 0-7/10"}
-     :body    "01234567"}
+        {:headers {"range" "bytes=5-7"}}
+        {:status  206
+         :headers {"Content-Length" "3"
+                   "Content-Range"  "bytes 5-7/10"}
+         :body    "567"}
 
-    {:headers {"range" "bytes=5-"}}
-    {:status  206
-     :headers {"Content-Length" "5"
-               "Content-Range"  "bytes 5-9/10"}
-     :body    "56789"})  )
+        {:headers {"range" "bytes=-7"}}
+        {:status  206
+         :headers {"Content-Length" "8"
+                   "Content-Range"  "bytes 0-7/10"}
+         :body    "01234567"}
+
+        {:headers {"range" "bytes=5-"}}
+        {:status  206
+         :headers {"Content-Length" "5"
+                   "Content-Range"  "bytes 5-9/10"}
+         :body    "56789"})))
+
+  (testing "unexpected body type, leave body untouched"
+    (let [res {:status  200
+               :headers {"Content-Length" "10"}
+               :body    (atom "dummy")}
+          f   (sut/wrap-partial-content (constantly res))]
+      (is (= (f {:headers {"range" "bytes=5-7"}})
+             res)))))
