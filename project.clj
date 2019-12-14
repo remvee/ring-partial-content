@@ -1,4 +1,4 @@
-(defproject ring-partial-content "1.0.0"
+(defproject ring-partial-content "2.0.0"
   :description "Partial Content middleware for ring."
   :url "https://github.com/remvee/ring-partial-content/"
 
