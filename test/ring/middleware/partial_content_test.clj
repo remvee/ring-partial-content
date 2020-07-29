@@ -45,11 +45,23 @@
 
 (deftest wrap-partial-content
 
+  (testing "non range request"
+    (let [res {:status  200
+               :headers {"Content-Length" "10"}
+               :body    "0123456789"}
+          f   (sut/wrap-partial-content (constantly res))]
+      (is (= {:status  200
+              :headers {"Accept-Ranges"  "bytes"
+                        "Content-Length" "10"}
+              :body    "0123456789"}
+             (f {}))
+          "only Accept-Ranges added")))
+
   (testing "range cases"
     (let [res {:status  200
                :headers {"Content-Length" "10"}
                :body    "0123456789"}
-          f (sut/wrap-partial-content (constantly res))]
+          f   (sut/wrap-partial-content (constantly res))]
       (are [req expected]
           (= expected
              (-> (f req)
@@ -57,19 +69,22 @@
 
         {:headers {"range" "bytes=5-7"}}
         {:status  206
-         :headers {"Content-Length" "3"
+         :headers {"Accept-Ranges"  "bytes"
+                   "Content-Length" "3"
                    "Content-Range"  "bytes 5-7/10"}
          :body    "567"}
 
         {:headers {"range" "bytes=-7"}}
         {:status  206
-         :headers {"Content-Length" "8"
+         :headers {"Accept-Ranges"  "bytes"
+                   "Content-Length" "8"
                    "Content-Range"  "bytes 0-7/10"}
          :body    "01234567"}
 
         {:headers {"range" "bytes=5-"}}
         {:status  206
-         :headers {"Content-Length" "5"
+         :headers {"Accept-Ranges"  "bytes"
+                   "Content-Length" "5"
                    "Content-Range"  "bytes 5-9/10"}
          :body    "56789"})))
 
