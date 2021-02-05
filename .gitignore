@@ -3,5 +3,4 @@
 /.lein-failures
 /pom.xml
 /target/
-/doc
 /.nrepl-port
