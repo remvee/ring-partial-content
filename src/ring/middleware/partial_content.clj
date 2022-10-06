@@ -64,6 +64,7 @@
           (if (or start end)
             (let [start (or start 0)
                   end   (or end (dec content-length))
+                  end   (if (> end content-length) (dec content-length) end)
                   body  (slice body start (inc end))]
               (-> res
                   (assoc :status 206)
