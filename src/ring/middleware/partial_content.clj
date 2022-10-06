@@ -57,13 +57,15 @@
           content-length                (when-let [v (get-in res [:headers "Content-Length"])]
                                           (Long/valueOf v))
           [start end]                   (when-let [v (get-in req [:headers "range"])]
-                                          (map #(and (not= "" %) (Long/valueOf %))
+                                          (map #(when (not= "" %) (Long/valueOf %))
                                                (rest (re-matches #"bytes=(\d*)-(\d*)" v))))]
       (if (and (= 200 status) content-length (can-slice? body))
         (let [res (assoc-in res [:headers "Accept-Ranges"] "bytes")]
           (if (or start end)
             (let [start (or start 0)
-                  end   (or end (dec content-length))
+                  end   (if (or (nil? end) (>= end content-length))
+                          (dec content-length)
+                          end)
                   body  (slice body start (inc end))]
               (-> res
                   (assoc :status 206)

@@ -86,6 +86,13 @@
          :headers {"Accept-Ranges"  "bytes"
                    "Content-Length" "5"
                    "Content-Range"  "bytes 5-9/10"}
+         :body    "56789"}
+
+        {:headers {"range" "bytes=5-999"}}
+        {:status  206
+         :headers {"Accept-Ranges"  "bytes"
+                   "Content-Length" "5"
+                   "Content-Range"  "bytes 5-9/10"}
          :body    "56789"})))
 
   (testing "unexpected body type, leave body untouched"
