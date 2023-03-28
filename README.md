@@ -6,7 +6,7 @@ RFC2616 section 10.2.7.
 
 ## Usage
 
-```
+```clojure
 (use 'ring.middleware.partial-content)
 (def app (-> routes .. wrap-partial-content))
 ```
@@ -17,10 +17,14 @@ RFC2616 section 10.2.7.
 Drop the following dependency in your `project.clj` at the
 appropriate place:
 
-```
-[ring-partial-content "1.0.0"]
+```clojure
+[ring-partial-content "2.0.1"]
 ```
 
+## Contribute
+
+Send bug reports and patches to
+[~rwv/public-inbox@lists.sr.ht](mailto:~rwv/public-inbox@lists.sr.ht).
 
 ## License
 
