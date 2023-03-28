@@ -1,11 +1,14 @@
 # build.sr.ht
 
-image: debian/buster
+image: debian/stable
+
 packages:
-  - openjdk-11-jdk-headless
+  - default-jre-headless
   - leiningen
+
 sources:
   - https://git.sr.ht/~rwv/ring-partial-content
+
 tasks:
   - test: |
       cd ring-partial-content
