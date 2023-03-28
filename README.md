@@ -18,7 +18,7 @@ Drop the following dependency in your `project.clj` at the
 appropriate place:
 
 ```clojure
-[ring-partial-content "2.0.1"]
+[ring-partial-content "2.0.2"]
 ```
 
 ## Contribute

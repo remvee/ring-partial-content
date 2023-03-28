@@ -1,4 +1,4 @@
-(defproject ring-partial-content "2.0.1"
+(defproject ring-partial-content "2.0.2"
   :description "Partial Content middleware for ring."
   :url "https://git.sr.ht/~rwv/ring-partial-content"
   :scm {:name "git" :url "https://git.sr.ht/~rwv/ring-partial-content"}
